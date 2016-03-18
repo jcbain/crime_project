@@ -4,7 +4,7 @@ library(ggplot2)
 library(plotly)
 library(reshape2)
 
-
+# read in a year of the data
 df13<-read.csv('output_data/new_2013.csv')
 
 #create state codes
@@ -17,21 +17,20 @@ states<-aggregate(cbind(Population, Total_Offenses,Crimes_Against_Persons,Crimes
 proSt<-states[,3:ncol(states)]/states$Population
 prost<-cbind(states[,1:2],proSt)
 
-# histograms of super-types of crime
-hist(df13$Crimes_Against_Persons/df13$Population)
-hist(df13$Crimes_Against_Property/df13$Population)
-hist(df13$Crimes_Against_Society/df13$Population)
+
 
 # transform counts into proportions (each offense/total population per 100,000 people)
 props<-df13[, 6:68]/(df13$Population) # first find the proportion for each crime
-prop13<-na.omit(cbind(df13[,c(1:6,69:70)],props))
+prop13<-na.omit(cbind(df13[,c(1:5,69:70)],props))
+
+
 
 # play around with some graphs to explore the data
 plot_ly(prop13, x = Population, y = Crimes_Against_Persons, text = paste("Agency: ", Agency_Name),
         mode = "markers", color = Agency_Type)
 
-plot_ly(prop13, x = Crimes_Against_Persons, color = Region, type = "box")
-plot_ly(prop13, x = Region,y = Crimes_Against_Persons, color = State, type = "box") %>%
+plot_ly(prop13, x = Total_Offenses, color = Region, type = "box")
+plot_ly(prop13, x = Region,y = Homicide_Offenses, color = State, type = "box") %>%
   layout(boxmode = "group")
 
 ##########################
@@ -48,8 +47,8 @@ g <- list(
   lakecolor = toRGB('gray')
 )
 
-plot_ly(prost, z = Crimes_Against_Society,locations = codes, text=paste0('<br>Population: ', Population), type = 'choropleth',
-        locationmode = 'USA-states', color = Crimes_Against_Society,colors = 'Reds',
+plot_ly(prost, z = Total_Offenses,locations = codes, text=paste0('<br>Population: ', Population), type = 'choropleth',
+        locationmode = 'USA-states', color = Total_Offenses,colors = 'Reds',
         marker = list(line = l),colorbar = list(title = "Total Offenses Rate")) %>%
   layout(title = '2013 Crime Rates per Capita<br>(Hover for breakdown)', geo = g)
 
