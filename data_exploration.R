@@ -10,7 +10,12 @@ df13<-read.csv('output_data/new_2013.csv')
 #create state codes
 df13$codes<-as.factor(state.abb[match(df13$State,state.name)] )
 
+# aggregate some data based on the sum of offenses per each state
 states<-aggregate(cbind(Population, Total_Offenses,Crimes_Against_Persons,Crimes_Against_Property,Crimes_Against_Society)~codes, data=df13, sum, na.rm=TRUE)
+
+#find proportions based off of population for each state
+proSt<-states[,3:ncol(states)]/states$Population
+prost<-cbind(states[,1:2],proSt)
 
 # histograms of super-types of crime
 hist(df13$Crimes_Against_Persons/df13$Population)
@@ -29,21 +34,23 @@ plot_ly(prop13, x = Crimes_Against_Persons, color = Region, type = "box")
 plot_ly(prop13, x = Region,y = Crimes_Against_Persons, color = State, type = "box") %>%
   layout(boxmode = "group")
 
-# give state boundaries a white border
-l <- list(color = toRGB("white"), width = 2)
+##########################
+####### MAPS!!!!! ########
+##########################
+
+# give state boundaries a black border
+l <- list(color = toRGB("black"), width = .5)
 # specify some map projection/options
 g <- list(
   scope = 'usa',
   projection = list(type = 'albers usa'),
   showlakes = TRUE,
-  lakecolor = toRGB('white')
+  lakecolor = toRGB('gray')
 )
 
-plot_ly(states, z = Population,locations = codes, text=codes, type = 'choropleth',
-        locationmode = 'USA-states', color = Population,colors = 'Reds',
-        marker = list(line = l),colorbar = list(title = "Millions USD")) %>%
-  layout(title = '2011 US Agriculture Exports by State<br>(Hover for breakdown)', geo = g)
+plot_ly(prost, z = Crimes_Against_Society,locations = codes, text=paste0('<br>Population: ', Population), type = 'choropleth',
+        locationmode = 'USA-states', color = Crimes_Against_Society,colors = 'Reds',
+        marker = list(line = l),colorbar = list(title = "Total Offenses Rate")) %>%
+  layout(title = '2013 Crime Rates per Capita<br>(Hover for breakdown)', geo = g)
 
-aggregate(df13$Population,by=df13$codes, FUN=sum)
 
-states<-aggregate(c(Population, Total_Offenses) ~ codes, data = df13, FUN = sum)
