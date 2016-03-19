@@ -45,9 +45,6 @@ prop13<-cbind(df13[,c(1:5,69:70)],props13)
 props14<-df14[, 6:68]/(df14$Population) 
 prop14<-cbind(df14[,c(1:5,69:70)],props14)
 
-## count the number of NAs in a data frame ##
-na_count <-sapply(prop12, function(y) sum(length(which(is.na(y)))))
-na_count <- data.frame(na_count)
 
 ## write proportion data frames to csv ##
 write.csv(prop12,file = 'output_data/prop12.csv',row.names=FALSE)
