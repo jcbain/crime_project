@@ -49,8 +49,13 @@ prop14<-cbind(df14[,c(1:5,69:70)],props14)
 na_count <-sapply(prop12, function(y) sum(length(which(is.na(y)))))
 na_count <- data.frame(na_count)
 
+## write proportion data frames to csv ##
+write.csv(prop12,file = 'output_data/prop12.csv',row.names=FALSE)
+write.csv(prop13,file = 'output_data/prop13.csv',row.names=FALSE)
+write.csv(prop14,file = 'output_data/prop14.csv',row.names=FALSE)
 
-model<-lm(Population ~Negligent_Manslaughter,data = prop14)
+## some simple models ##
+model<-lm(Population ~Prostitution,data = prop13)
 
 # play around with some graphs to explore the data
 plot_ly(prop12, x = Crimes_Against_Persons, y = Population, text = paste("Agency: ", Agency_Name),
