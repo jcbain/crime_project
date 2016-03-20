@@ -62,15 +62,43 @@ prost14<-cbind(states14[,1:2],proStates14)
 prost<-rbind(prost12,prost13,prost14)
 
 ## count the number of NAs in a data frame ##
-as.data.frame(sapply(df14, function(y) (sum(length(which(is.na(y))))))) 
+as.data.frame(sapply(p14, function(y) (sum(length(which(is.na(y))))))) 
 
-df<-na.omit(df14)
+s12<-subset(p12, select=c('Agency_Type','codes','Region','Population','Crimes_Against_Persons',
+                          'Crimes_Against_Property','Crimes_Against_Society','Total_Offenses',
+                          'Homicide_Offenses', 'Murder_and_Nonnegligent_Manslaughter',
+                          'Negligent_Manslaughter','Justifiable_Homicide'))
+s13<-subset(p13, select=c('Agency_Type','codes','Region','Population','Crimes_Against_Persons',
+                          'Crimes_Against_Property','Crimes_Against_Society','Total_Offenses',
+                          'Homicide_Offenses', 'Murder_and_Nonnegligent_Manslaughter',
+                          'Negligent_Manslaughter','Justifiable_Homicide'))
+s14<-subset(p14, select=c('Agency_Type','codes','Region','Population','Crimes_Against_Persons',
+                          'Crimes_Against_Property','Crimes_Against_Society','Total_Offenses',
+                          'Homicide_Offenses', 'Murder_and_Nonnegligent_Manslaughter',
+                          'Negligent_Manslaughter','Justifiable_Homicide'))
+
+s12$year<-2012
+s13$year<-2013
+s14$year<-2014
+
+
+df<-rbind(s12,s13,s14)
+
+df<-na.omit(df)
+
+
+########********########
+## NAIVE BAYES !!!!!! ##
+########********########
 
 ## discritize crimes against persons ##
-cap_discr<-EqualFreq(df$Robbery,5)
+discr<-EqualFreq(df$Homicide_Offenses,5)
 
-x = subset(df,select=c("Population","codes" ))
+x = subset(df,select=c("Population","codes"))
 x = subset(df,select=c("Population"))
-y = as.factor(cap_discr)
+y = as.factor(discr)
 
 model = train(x,y,'nb',trControl=trainControl(method='cv',number=10))
+
+
+
