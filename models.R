@@ -8,6 +8,7 @@ library(caret)
 library(ggplot2)
 library(plotly)
 library(caret)
+library(Hmisc)
 
 ######################
 ## CUSTOM FUNCTIONS ##
@@ -71,7 +72,7 @@ as.data.frame(sapply(p14, function(y) (sum(length(which(is.na(y)))))))
 ## NAIVE BAYES !!!!!! ##
 ########********########
 
-df<-subset(p12, select=c('Agency_Type','codes','Region','Population','Crimes_Against_Persons',
+df<-subset(p14, select=c('Agency_Type','codes','Region','Population','Crimes_Against_Persons',
                           'Crimes_Against_Property','Crimes_Against_Society','Total_Offenses',
                           'Homicide_Offenses', 'Murder_and_Nonnegligent_Manslaughter',
                           'Negligent_Manslaughter','Justifiable_Homicide'))
@@ -79,7 +80,9 @@ df<-subset(p12, select=c('Agency_Type','codes','Region','Population','Crimes_Aga
 df<-na.omit(df)
 
 ## discritize crimes against persons ##
-df$discr<-EqualFreq(df$Murder_and_Nonnegligent_Manslaughter,5)
+df$discr<-EqualFreq(df$Crimes_Against_Property,3)
+
+df$discr<-as.factor(df$discr)
 
 ## create a subset of data ##
 sub = sample(nrow(df), floor(nrow(df) * 0.6))
@@ -98,7 +101,8 @@ model = train(xTrain,yTrain,'nb',trControl=trainControl(method='cv',number=10))
 prop.table(table(predict(model$finalModel,xTest)$class,yTest))
 table(predict(model$finalModel,xTest)$class,yTest)
 
-
+## plot box plots based on discritization ##
+plot_ly(df, x = Population, color = factor(discr), type = "box")
 
 
 
@@ -133,7 +137,7 @@ df<-na.omit(df)
 
 
 ## discritize crimes against persons ##
-df$discr<-EqualFreq(df$Murder_and_Nonnegligent_Manslaughter,5)
+df$discr<-EqualFreq(df$Crimes_Against_Persons,2)
 
 ## create a subset of data ##
 sub = sample(nrow(df), floor(nrow(df) * 0.6))
