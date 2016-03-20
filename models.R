@@ -64,6 +64,51 @@ prost<-rbind(prost12,prost13,prost14)
 ## count the number of NAs in a data frame ##
 as.data.frame(sapply(p14, function(y) (sum(length(which(is.na(y))))))) 
 
+
+
+
+########********########
+## NAIVE BAYES !!!!!! ##
+########********########
+
+df<-subset(p12, select=c('Agency_Type','codes','Region','Population','Crimes_Against_Persons',
+                          'Crimes_Against_Property','Crimes_Against_Society','Total_Offenses',
+                          'Homicide_Offenses', 'Murder_and_Nonnegligent_Manslaughter',
+                          'Negligent_Manslaughter','Justifiable_Homicide'))
+
+df<-na.omit(df)
+
+## discritize crimes against persons ##
+df$discr<-EqualFreq(df$Murder_and_Nonnegligent_Manslaughter,5)
+
+## create a subset of data ##
+sub = sample(nrow(df), floor(nrow(df) * 0.6))
+
+## 1 part of the subset will be a training the other will be a test ##
+train<-df[sub,]
+test<-df[-sub,]
+
+xTrain<-subset(train,select=c("Population","codes"))
+yTrain<-as.factor(train$discr)
+
+xTest<-subset(test,select=c("Population","codes"))
+yTest<-as.factor(test$discr)
+
+model = train(xTrain,yTrain,'nb',trControl=trainControl(method='cv',number=10))
+prop.table(table(predict(model$finalModel,xTest)$class,yTest))
+table(predict(model$finalModel,xTest)$class,yTest)
+
+
+
+
+
+#************************************************#
+#************************************************#
+
+#############################
+### COMBINING DATAFRAMES ####
+#############################
+
 s12<-subset(p12, select=c('Agency_Type','codes','Region','Population','Crimes_Against_Persons',
                           'Crimes_Against_Property','Crimes_Against_Society','Total_Offenses',
                           'Homicide_Offenses', 'Murder_and_Nonnegligent_Manslaughter',
@@ -87,18 +132,27 @@ df<-rbind(s12,s13,s14)
 df<-na.omit(df)
 
 
-########********########
-## NAIVE BAYES !!!!!! ##
-########********########
-
 ## discritize crimes against persons ##
-discr<-EqualFreq(df$Homicide_Offenses,5)
+df$discr<-EqualFreq(df$Murder_and_Nonnegligent_Manslaughter,5)
 
-x = subset(df,select=c("Population","codes"))
-x = subset(df,select=c("Population"))
-y = as.factor(discr)
+## create a subset of data ##
+sub = sample(nrow(df), floor(nrow(df) * 0.6))
 
-model = train(x,y,'nb',trControl=trainControl(method='cv',number=10))
+## 1 part of the subset will be a training the other will be a test ##
+train<-df[sub,]
+test<-df[-sub,]
+
+xTrain<-subset(train,select=c("Population","codes"))
+yTrain<-as.factor(train$discr)
+
+xTest<-subset(test,select=c("Population","codes"))
+yTest<-as.factor(test$discr)
+
+model = train(xTrain,yTrain,'nb',trControl=trainControl(method='cv',number=10))
+prop.table(table(predict(model$finalModel,xTest)$class,yTest))
+table(predict(model$finalModel,xTest)$class,yTest)
+
+
 
 
 
