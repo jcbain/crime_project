@@ -66,20 +66,11 @@ as.data.frame(sapply(df14, function(y) (sum(length(which(is.na(y)))))))
 
 df<-na.omit(df14)
 
-pop_discr<-EqualFreq(df$Crimes_Against_Persons,10)
+## discritize crimes against persons ##
+cap_discr<-EqualFreq(df$Robbery,5)
 
-x = subset(df,select=c("Population","Total_Offenses","Crimes_Against_Property","Crimes_Against_Society" ))
+x = subset(df,select=c("Population","codes" ))
 x = subset(df,select=c("Population"))
-y = as.factor(pop_discr)
-
-EqualFreq <- function(x,n){
-  nx <- length(x)
-  nrepl <- floor(nx/n)
-  nplus <- sample(1:n,nx - nrepl*n)
-  nrep <- rep(nrepl,n)
-  nrep[nplus] <- nrepl+1
-  x[order(x)] <- rep(seq.int(n),nrep)
-  x
-}
+y = as.factor(cap_discr)
 
 model = train(x,y,'nb',trControl=trainControl(method='cv',number=10))
