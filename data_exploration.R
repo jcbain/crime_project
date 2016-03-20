@@ -76,7 +76,7 @@ g <- list(
   lakecolor = toRGB('gray')
 )
 
-plot_ly(prost, z = Total_Offenses,locations = codes, text=paste0('<br>Population: ', Population), type = 'choropleth',
+plot_ly(prost13, z = Total_Offenses,locations = codes, text=paste0('<br>Population: ', Population), type = 'choropleth',
         locationmode = 'USA-states', color = Total_Offenses,colors = 'Reds',
         marker = list(line = l),colorbar = list(title = "Total Offenses Rate")) %>%
   layout(title = '2013 Crime Rates per Capita<br>(Hover for breakdown)', geo = g)
