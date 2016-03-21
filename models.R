@@ -73,13 +73,14 @@ as.data.frame(sapply(df, function(y) (sum(length(which(is.na(y)))))))
 ## NAIVE BAYES !!!!!! ##
 ########********########
 
-df<-subset(p14, select=c('Agency_Type','codes','Region','Population','Crimes_Against_Persons',
+df<-subset(p14, select=c('Agency_Type','Agency_Name','codes','Region','Population','Crimes_Against_Persons',
                           'Crimes_Against_Property','Crimes_Against_Society','Total_Offenses',
                           'Homicide_Offenses', 'Murder_and_Nonnegligent_Manslaughter',
                           'Negligent_Manslaughter','Justifiable_Homicide'))
 
 df<-na.omit(df)
 df<-df[df$Murder_and_Nonnegligent_Manslaughter >0,]
+
 
 
 ## discritize crimes against persons ##
@@ -111,7 +112,7 @@ table(predict(model$finalModel,xTest)$class,yTest)
 
 ## plot box plots based on discritization ##
 
-
+## no lables ##
 ax <- list(
   title = "",
   zeroline = FALSE,
@@ -119,10 +120,18 @@ ax <- list(
   showticklabels = FALSE,
   showgrid = FALSE
 )
- 
-plot_ly(df, x = Population, color = factor(disc), type = "box") %>%
-  layout( yaxis = ax)
 
+## plot in plotly murder rate per capita  
+plot_ly(df, x = Population, color = factor(disc), type = "box") %>%
+  layout(title= "Murder Rate Per Capita ~ Population Size", yaxis = ax)
+
+
+## What about those that didn't have a murder rate ? ##
+df2<-df[df$Murder_and_Nonnegligent_Manslaughter ==0,] 
+
+ggplot(data=df2, aes(x = Population)) + geom_histogram() +
+  geom_vline(aes(xintercept=mean(Population, na.rm=T)),  color="red", linetype="dashed", size=1) +
+  ggtitle("Population for those Place with a 0 Murder Rate")
 
 
 #************************************************#
