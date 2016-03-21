@@ -9,6 +9,7 @@ library(ggplot2)
 library(plotly)
 library(caret)
 library(Hmisc)
+require(e1071)
 
 ######################
 ## CUSTOM FUNCTIONS ##
@@ -63,7 +64,7 @@ prost14<-cbind(states14[,1:2],proStates14)
 prost<-rbind(prost12,prost13,prost14)
 
 ## count the number of NAs in a data frame ##
-as.data.frame(sapply(p14, function(y) (sum(length(which(is.na(y))))))) 
+as.data.frame(sapply(df, function(y) (sum(length(which(is.na(y))))))) 
 
 
 
@@ -78,11 +79,18 @@ df<-subset(p14, select=c('Agency_Type','codes','Region','Population','Crimes_Aga
                           'Negligent_Manslaughter','Justifiable_Homicide'))
 
 df<-na.omit(df)
+df<-df[df$Murder_and_Nonnegligent_Manslaughter >0,]
+
 
 ## discritize crimes against persons ##
-df$discr<-EqualFreq(df$Crimes_Against_Property,3)
+df$discr<-EqualFreq(df$Murder_and_Nonnegligent_Manslaughter,5)
 
 df$discr<-as.factor(df$discr)
+
+# relabel based off of lower than values
+df$disc<- factor(df$discr,
+                 levels = c(1,2,3,4,5),
+                 labels = c("< 3.134367e-05","< 5.273844e-05","< 9.168564e-05","< 0.0001800504","< 0.008196721"))
 
 ## create a subset of data ##
 sub = sample(nrow(df), floor(nrow(df) * 0.6))
@@ -92,17 +100,28 @@ train<-df[sub,]
 test<-df[-sub,]
 
 xTrain<-subset(train,select=c("Population","codes"))
-yTrain<-as.factor(train$discr)
+yTrain<-as.factor(train$disc)
 
 xTest<-subset(test,select=c("Population","codes"))
-yTest<-as.factor(test$discr)
+yTest<-as.factor(test$disc)
 
 model = train(xTrain,yTrain,'nb',trControl=trainControl(method='cv',number=10))
 prop.table(table(predict(model$finalModel,xTest)$class,yTest))
 table(predict(model$finalModel,xTest)$class,yTest)
 
 ## plot box plots based on discritization ##
-plot_ly(df, x = Population, color = factor(discr), type = "box")
+
+
+ax <- list(
+  title = "",
+  zeroline = FALSE,
+  showline = FALSE,
+  showticklabels = FALSE,
+  showgrid = FALSE
+)
+ 
+plot_ly(df, x = Population, color = factor(disc), type = "box") %>%
+  layout( yaxis = ax)
 
 
 
@@ -155,8 +174,4 @@ yTest<-as.factor(test$discr)
 model = train(xTrain,yTrain,'nb',trControl=trainControl(method='cv',number=10))
 prop.table(table(predict(model$finalModel,xTest)$class,yTest))
 table(predict(model$finalModel,xTest)$class,yTest)
-
-
-
-
 
