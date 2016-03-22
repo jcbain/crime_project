@@ -64,9 +64,7 @@ prost14<-cbind(states14[,1:2],proStates14)
 prost<-rbind(prost12,prost13,prost14)
 
 ## count the number of NAs in a data frame ##
-as.data.frame(sapply(df, function(y) (sum(length(which(is.na(y))))))) 
-
-
+as.data.frame(sapply(p14, function(y) (sum(length(which(is.na(y))))))) 
 
 
 ########********########
@@ -134,53 +132,13 @@ ggplot(data=df2, aes(x = Population)) + geom_histogram() +
   ggtitle("Population for those Place with a 0 Murder Rate")
 
 
-#************************************************#
-#************************************************#
+########********########
+## DECISION TREES!!!! ##
+########********########
 
-#############################
-### COMBINING DATAFRAMES ####
-#############################
+df<-na.omit(p14)
 
-s12<-subset(p12, select=c('Agency_Type','codes','Region','Population','Crimes_Against_Persons',
-                          'Crimes_Against_Property','Crimes_Against_Society','Total_Offenses',
-                          'Homicide_Offenses', 'Murder_and_Nonnegligent_Manslaughter',
-                          'Negligent_Manslaughter','Justifiable_Homicide'))
-s13<-subset(p13, select=c('Agency_Type','codes','Region','Population','Crimes_Against_Persons',
-                          'Crimes_Against_Property','Crimes_Against_Society','Total_Offenses',
-                          'Homicide_Offenses', 'Murder_and_Nonnegligent_Manslaughter',
-                          'Negligent_Manslaughter','Justifiable_Homicide'))
-s14<-subset(p14, select=c('Agency_Type','codes','Region','Population','Crimes_Against_Persons',
-                          'Crimes_Against_Property','Crimes_Against_Society','Total_Offenses',
-                          'Homicide_Offenses', 'Murder_and_Nonnegligent_Manslaughter',
-                          'Negligent_Manslaughter','Justifiable_Homicide'))
-
-s12$year<-2012
-s13$year<-2013
-s14$year<-2014
-
-
-df<-rbind(s12,s13,s14)
-
-df<-na.omit(df)
-
-
-## discritize crimes against persons ##
-df$discr<-EqualFreq(df$Crimes_Against_Persons,2)
-
-## create a subset of data ##
-sub = sample(nrow(df), floor(nrow(df) * 0.6))
-
-## 1 part of the subset will be a training the other will be a test ##
-train<-df[sub,]
-test<-df[-sub,]
-
-xTrain<-subset(train,select=c("Population","codes"))
-yTrain<-as.factor(train$discr)
-
-xTest<-subset(test,select=c("Population","codes"))
-yTest<-as.factor(test$discr)
-
-model = train(xTrain,yTrain,'nb',trControl=trainControl(method='cv',number=10))
-prop.table(table(predict(model$finalModel,xTest)$class,yTest))
-table(predict(model$finalModel,xTest)$class,yTest)
-
+frmla<- Sex_Offenses ~Agency_Type + Population + Region + codes
+TreeModel = ctree(frmla, data = df)
+plot(TreeModel)
+table(predict(TreeModel), df$Sex_Offenses)
