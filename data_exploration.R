@@ -82,3 +82,5 @@ plot_ly(prost13, z = Total_Offenses,locations = codes, text=paste0('<br>Populati
   layout(title = '2013 Crime Rates per Capita<br>(Hover for breakdown)', geo = g)
 
 
+
+

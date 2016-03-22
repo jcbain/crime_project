@@ -119,7 +119,7 @@ ax <- list(
   showgrid = FALSE
 )
 
-## plot in plotly murder rate per capita  
+## plot in plotly murder rate per capita ## 
 plot_ly(df, x = Population, color = factor(disc), type = "box") %>%
   layout(title= "Murder Rate Per Capita ~ Population Size", yaxis = ax)
 
