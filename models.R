@@ -64,7 +64,7 @@ prost14<-cbind(states14[,1:2],proStates14)
 prost<-rbind(prost12,prost13,prost14)
 
 ## count the number of NAs in a data frame ##
-as.data.frame(sapply(p12, function(y) (sum(length(which(is.na(y))))))) 
+as.data.frame(sapply(p14, function(y) (sum(length(which(is.na(y))))))) 
 
 
 ########********########
@@ -79,6 +79,7 @@ df<-subset(p14, select=c('Agency_Type','Agency_Name','codes','Region','Populatio
 df<-na.omit(df)
 df<-df[df$Murder_and_Nonnegligent_Manslaughter >0,]
 
+zeros<-df[df$Murder_and_Nonnegligent_Manslaughter==0,]
 
 
 ## discritize crimes against persons ##
