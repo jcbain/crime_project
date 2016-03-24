@@ -64,20 +64,30 @@ prost14<-cbind(states14[,1:2],proStates14)
 prost<-rbind(prost12,prost13,prost14)
 
 ## count the number of NAs in a data frame ##
-as.data.frame(sapply(p14, function(y) (sum(length(which(is.na(y))))))) 
+as.data.frame(sapply(p12, function(y) (sum(length(which(is.na(y))))))) 
 
 
 ########********########
 ## NAIVE BAYES !!!!!! ##
 ########********########
 
-df<-subset(p14, select=c('Agency_Type','Agency_Name','codes','Region','Population','Crimes_Against_Persons',
+# define a training set off of 2013 data
+df_13<-subset(p13, select=c('Agency_Type','Agency_Name','codes','Region','Population','Crimes_Against_Persons',
+                         'Crimes_Against_Property','Crimes_Against_Society','Total_Offenses',
+                         'Homicide_Offenses', 'Murder_and_Nonnegligent_Manslaughter',
+                         'Negligent_Manslaughter','Justifiable_Homicide'))
+
+df_13<-na.omit(df_13)
+df_13<-df_13[df_13$Murder_and_Nonnegligent_Manslaughter >0,]
+
+# define a testing set off of 2013 data
+df_14<-subset(p14, select=c('Agency_Type','Agency_Name','codes','Region','Population','Crimes_Against_Persons',
                           'Crimes_Against_Property','Crimes_Against_Society','Total_Offenses',
                           'Homicide_Offenses', 'Murder_and_Nonnegligent_Manslaughter',
                           'Negligent_Manslaughter','Justifiable_Homicide'))
 
-df<-na.omit(df)
-df<-df[df$Murder_and_Nonnegligent_Manslaughter >0,]
+df_14<-na.omit(df_14)
+df_14<-df_14[df_14$Murder_and_Nonnegligent_Manslaughter >0,]
 
 
 
